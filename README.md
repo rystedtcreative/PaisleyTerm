@@ -2,8 +2,6 @@
 
 A macOS SSH session manager with a live AI-agent status dashboard. Run Claude Code or OpenCode on your remote machines and see what every agent is doing — thinking, running tools, waiting for your input — at a glance, from one native window.
 
-![PaisleyTerm screenshot](docs/screenshot.png)
-
 ## Why
 
 If you run coding agents on several servers at once, you end up cycling through terminal tabs to check whether each agent is still working, stuck on a permission prompt, or done. PaisleyTerm puts every SSH session in a sidebar with a color-coded status dot driven by live parsing of the agent's terminal output — no server-side setup, no plugins, nothing to install on the remote host.
