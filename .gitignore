@@ -1,0 +1,43 @@
+# Xcode / Swift build artifacts
+.build/
+*.xcodeproj/
+*.xcworkspace/
+xcuserdata/
+DerivedData/
+*.moved-aside
+*.pbxuser
+!default.pbxuser
+*.mode1v3
+!default.mode1v3
+*.mode2v3
+!default.mode2v3
+*.perspectivev3
+!default.perspectivev3
+
+# Swift Package Manager
+.swiftpm/
+Packages/
+
+# Local AI tool workspaces and agent tooling (not part of the public repo)
+.opencode/
+.antigravitycli/
+.claude/
+CLAUDE.md
+AGENTS.md
+GEMINI.md
+opencode.json
+.vscode/settings.json
+
+# Design source files
+*.psd
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+.Spotlight-V100
+.Trashes
+
+# App bundle binary (rebuilt on each `swift build`)
+PaisleyTerm.app/Contents/MacOS/PaisleyTerm

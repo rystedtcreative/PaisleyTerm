@@ -1,0 +1,28 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  build:
+    name: Build (macOS)
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@v4
+
+      # Zero-warning builds are the project's quality bar. The warning check is
+      # scoped to Sources/PaisleyTerm so dependency warnings can't fail CI.
+      # There is intentionally no test step: automated testing is unworkable on
+      # a CLT-only toolchain (see CONTRIBUTING.md); REGRESSION_CHECKLIST.md is
+      # the manual safety net.
+      - name: Build (debug)
+        run: swift build 2>&1 | tee build.log
+
+      - name: Fail on warnings in PaisleyTerm sources
+        run: '! grep -E "Sources/PaisleyTerm/.*warning:" build.log'
+
+      - name: Build (release)
+        run: swift build -c release
