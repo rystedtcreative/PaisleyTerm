@@ -13,8 +13,9 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      # Zero warnings are enforced by the compiler via -warnings-as-errors on the
-      # project's targets (see Package.swift), so a warning fails `swift build`.
+      # PaisleyCore builds under -warnings-as-errors (see Package.swift). The app
+      # target is not yet under that flag (pending a Swift-6 concurrency cleanup),
+      # so app warnings don't fail the build here yet.
       - name: Build (debug)
         run: swift build
 
