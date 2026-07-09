@@ -39,6 +39,17 @@ git config core.hooksPath .githooks
 Most style issues are warnings (they won't block) and are auto-fixable with
 `swiftlint --fix <files>`. CI also runs SwiftLint on every push/PR.
 
+### Zero-warning builds & a known follow-up
+
+`Package.swift` compiles with `-warnings-as-errors`, but **only on `PaisleyCore`**
+for now. The macOS `PaisleyTerm` app target has pre-existing Swift-6 concurrency
+warnings that newer toolchains surface — e.g. cross-actor access of `@MainActor`
+`SSHSession` state from the `SSHService` actor (`let profile = session.profile`
+should be `await`ed, and `ConnectionProfile`/`AgentStatus` want `Sendable`
+conformance). Cleaning those up (and then re-adding `swiftSettings: strictWarnings`
+to the `PaisleyTerm` target) is a good follow-up — do it on a Mac where the app
+target actually compiles, since it can't be built on Linux.
+
 ## Testing: read this before writing tests
 
 **The `PaisleyCore` engine is unit-tested; the macOS UI is not.** Run the suite with
