@@ -1,5 +1,6 @@
 import Foundation
 import Combine
+import PaisleyCore
 import Citadel
 import NIOCore
 import NIOSSH

@@ -1,4 +1,5 @@
 import SwiftUI
+import PaisleyCore
 
 struct SessionRowView: View {
     @ObservedObject var session: SSHSession

@@ -1,5 +1,6 @@
 import SwiftUI
 import Combine
+import PaisleyCore
 
 @MainActor
 final class AppState: ObservableObject {

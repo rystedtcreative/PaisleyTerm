@@ -7,22 +7,48 @@ on:
     branches: [main]
 
 jobs:
-  build:
-    name: Build (macOS)
+  macos:
+    name: macOS (build + test)
     runs-on: macos-15
     steps:
       - uses: actions/checkout@v4
 
-      # Zero-warning builds are the project's quality bar. The warning check is
-      # scoped to Sources/PaisleyTerm so dependency warnings can't fail CI.
-      # There is intentionally no test step: automated testing is unworkable on
-      # a CLT-only toolchain (see CONTRIBUTING.md); REGRESSION_CHECKLIST.md is
-      # the manual safety net.
+      # Zero warnings are enforced by the compiler via -warnings-as-errors on the
+      # project's targets (see Package.swift), so a warning fails `swift build`.
       - name: Build (debug)
-        run: swift build 2>&1 | tee build.log
+        run: swift build
 
-      - name: Fail on warnings in PaisleyTerm sources
-        run: '! grep -E "Sources/PaisleyTerm/.*warning:" build.log'
+      # GitHub's macOS runners ship full Xcode, so XCTest is present and the
+      # PaisleyCore suite runs here (unlike a local CLT-only toolchain).
+      - name: Test
+        run: swift test
 
       - name: Build (release)
         run: swift build -c release
+
+  linux:
+    name: Linux (build + test)
+    runs-on: ubuntu-latest
+    container: swift:6.1
+    steps:
+      - uses: actions/checkout@v4
+
+      # On Linux the manifest gates the SwiftUI app out (#if os(macOS)), so this
+      # builds and tests PaisleyCore — the platform-agnostic engine — alone.
+      # -warnings-as-errors (Package.swift) means a warning fails the build.
+      - name: Build
+        run: swift build
+
+      - name: Test
+        run: swift test
+
+  lint:
+    name: SwiftLint
+    runs-on: ubuntu-latest
+    container: ghcr.io/realm/swiftlint:latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: SwiftLint
+        # Non-strict for now: reports violations as annotations and fails only on
+        # error-severity rules. Tighten to `--strict` once the tree is clean.
+        run: swiftlint lint --reporter github-actions-logging

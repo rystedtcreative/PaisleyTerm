@@ -1,6 +1,7 @@
 import Foundation
 import Combine
 import SwiftUI
+import PaisleyCore
 
 enum ConnectionStatus {
     case disconnected

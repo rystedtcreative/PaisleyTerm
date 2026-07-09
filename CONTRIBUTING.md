@@ -15,11 +15,45 @@ open PaisleyTerm.app
 
 SSH sessions require macOS 15+; the local terminal works on macOS 14.
 
+## Linting & the pre-commit hook
+
+The project lints with [SwiftLint](https://github.com/realm/SwiftLint) (config in
+`.swiftlint.yml`). Install it:
+
+```bash
+# macOS
+brew install swiftlint
+
+# Linux (prebuilt static binary from the SwiftLint releases)
+curl -sSL https://github.com/realm/SwiftLint/releases/latest/download/swiftlint_linux_amd64.zip -o /tmp/sl.zip
+unzip -o /tmp/sl.zip -d /tmp/sl && install -m0755 /tmp/sl/swiftlint-static ~/.local/bin/swiftlint
+```
+
+A pre-commit hook in `.githooks/` runs SwiftLint on staged Swift files and blocks the
+commit on error-severity violations. Enable it once per clone:
+
+```bash
+git config core.hooksPath .githooks
+```
+
+Most style issues are warnings (they won't block) and are auto-fixable with
+`swiftlint --fix <files>`. CI also runs SwiftLint on every push/PR.
+
 ## Testing: read this before writing tests
 
-**There is no automated test suite, deliberately.** Both swift-testing and XCTest were evaluated and found unworkable on a Command Line Tools–only toolchain: XCTest ships no framework there at all, and swift-testing compiles but fails to discover/run any tests. Don't reintroduce a test target without first confirming `swift test` actually reports results in your environment — and note CI runs CLT-style builds too.
+**The `PaisleyCore` engine is unit-tested; the macOS UI is not.** Run the suite with
+`swift test` — it exercises the agent-output parsers, the pure text-analysis helpers,
+`ConnectionProfile`, and `ProfileStore` (`Tests/PaisleyCoreTests`). It runs on Linux with
+the swift.org toolchain and on GitHub's macOS runners, both of which ship XCTest. The old
+"testing is unworkable" note was a Command Line Tools limitation only (the `xctest` runner
+lives inside Xcode.app); it does not apply to a full toolchain. **When you change parsing
+or profile logic, add or update tests there** rather than relying on the manual checklist.
 
-Instead, **[REGRESSION_CHECKLIST.md](REGRESSION_CHECKLIST.md) is the regression safety net.** It covers the areas that have regressed repeatedly and that the compiler can't check: the terminal/scroll subsystem (`Views/Terminal/SSHTerminalView.swift`, `Views/Terminal/TerminalView.swift`) and `Services/AgentMonitor.swift`.
+What tests do *not* cover is the SwiftUI/AppKit UI and live terminal behavior. For that,
+**[REGRESSION_CHECKLIST.md](REGRESSION_CHECKLIST.md) is the safety net.** It covers the
+areas that have regressed repeatedly and that neither the compiler nor unit tests can
+check: the terminal/scroll subsystem (`Views/Terminal/SSHTerminalView.swift`,
+`Views/Terminal/TerminalView.swift`) and `Services/AgentMonitor.swift`'s orchestration.
 
 The rules:
 
@@ -28,7 +62,7 @@ The rules:
 
 ## Pull request expectations
 
-- `swift build` must complete with **zero warnings** — that's the project's quality bar in place of tests.
+- `swift build` must complete with **zero warnings**, and `swift test` must pass — both are enforced by CI (macOS and Linux).
 - Match the surrounding code's style; the codebase favors small, single-purpose files.
 - Keep PRs focused — one behavior change per PR.
 - Never store secrets outside the Keychain, and never read SSH key material into app state (see [SECURITY.md](SECURITY.md)).

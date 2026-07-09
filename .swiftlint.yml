@@ -1,0 +1,39 @@
+# SwiftLint configuration for PaisleyTerm.
+#
+# Philosophy: real problems are errors (they block the pre-commit hook and are
+# annotated in CI); stylistic choices this codebase makes deliberately are
+# disabled rather than fought. Tighten over time.
+
+included:
+  - Sources
+  - Tests
+
+excluded:
+  - .build
+
+disabled_rules:
+  - todo                            # ARCHITECTURE / parser calibration notes use TODO deliberately
+  - trailing_whitespace             # editor concern, not worth failing a commit
+  - trailing_comma                  # this codebase uses trailing commas in multi-line literals on purpose
+  - implicit_optional_initialization # explicit `= nil` reads clearly on @Published properties
+
+line_length:
+  warning: 140
+  # Two long lines live in existing files (incl. the fragile terminal views);
+  # keep them as warnings, not hard errors, so touching those files isn't blocked.
+  error: 320
+  ignores_comments: true
+  ignores_urls: true
+
+cyclomatic_complexity:
+  # The agent-start detection is a flat chain of `||` guards — inherently branchy
+  # but simple to read; don't treat that as a complexity problem.
+  warning: 15
+  error: 25
+
+identifier_name:
+  # Allow idiomatic single-character names (r/g/b colour channels, a/b comparator
+  # params, loop indices). Casing/other identifier checks still apply.
+  min_length:
+    warning: 1
+    error: 1

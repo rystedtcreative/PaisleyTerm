@@ -1,4 +1,5 @@
 import SwiftUI
+import PaisleyCore
 
 struct AgentContextMenu: View {
     @ObservedObject var session: SSHSession
