@@ -76,4 +76,4 @@ See [ARCHITECTURE.md](ARCHITECTURE.md) for the data-flow design, the Citadel PTY
 
 ## License
 
-[MIT](LICENSE) © 2026 Joshua Rystedt
+[Apache License 2.0](LICENSE) © 2026 Joshua Rystedt. See [NOTICE](NOTICE) for attribution requirements for derivative works.
