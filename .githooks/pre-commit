@@ -1,0 +1,39 @@
+#!/usr/bin/env bash
+#
+# PaisleyTerm pre-commit hook — runs SwiftLint on staged Swift files.
+#
+# Enable once per clone:
+#     git config core.hooksPath .githooks
+#
+# Requires SwiftLint on PATH (or at ~/.local/bin/swiftlint). It lints only the
+# staged .swift files and blocks the commit on error-severity violations. Most
+# style issues are warnings (won't block) and are auto-fixable with
+# `swiftlint --fix`. Bypass in a pinch with `git commit --no-verify`.
+
+set -euo pipefail
+
+# Locate swiftlint: PATH first, then the common local install dir.
+SWIFTLINT="$(command -v swiftlint || true)"
+if [ -z "$SWIFTLINT" ] && [ -x "$HOME/.local/bin/swiftlint" ]; then
+    SWIFTLINT="$HOME/.local/bin/swiftlint"
+fi
+if [ -z "$SWIFTLINT" ]; then
+    echo "pre-commit: swiftlint not found — skipping lint."
+    echo "            Install it (see CONTRIBUTING.md) to enable pre-commit linting."
+    exit 0
+fi
+
+# Staged Swift files (added/copied/modified), null-delimited for paths with spaces.
+mapfile -d '' -t FILES < <(git diff --cached --name-only --diff-filter=ACM -z -- '*.swift')
+if [ ${#FILES[@]} -eq 0 ]; then
+    exit 0
+fi
+
+echo "pre-commit: linting ${#FILES[@]} staged Swift file(s) with SwiftLint…"
+if ! "$SWIFTLINT" lint --quiet "${FILES[@]}"; then
+    echo
+    echo "pre-commit: SwiftLint reported blocking violations (see above)."
+    echo "            Many are auto-fixable:  swiftlint --fix ${FILES[*]}"
+    echo "            Bypass once (not recommended):  git commit --no-verify"
+    exit 1
+fi

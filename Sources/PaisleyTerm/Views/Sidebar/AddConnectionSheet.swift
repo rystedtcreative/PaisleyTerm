@@ -1,5 +1,6 @@
 import SwiftUI
 import AppKit
+import PaisleyCore
 
 struct AddConnectionSheet: View {
     @EnvironmentObject var appState: AppState

@@ -18,6 +18,9 @@ DerivedData/
 .swiftpm/
 Packages/
 
+# swiftly toolchain installer artifacts (extract elsewhere, not in the repo)
+swiftly-*.tar.gz
+
 # Local AI tool workspaces and agent tooling (not part of the public repo)
 .opencode/
 .antigravitycli/
